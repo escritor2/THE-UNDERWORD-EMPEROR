@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>O Despertar de Nico — Livro Web</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+    <style>
+        /* Reset e Variáveis Melhoradas */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            --cor-fundo: #09090b;
+            --cor-painel: #1a1a20;
+            --cor-accent: #e5b84a;
+            --cor-texto-principal: #e8e8e8;
+            --cor-texto-mutado: #a0a0a0;
+            --cor-borda-escura: rgba(255, 255, 255, 0.08);
+            --cor-borda-clara: rgba(255, 255, 255, 0.05);
+            --sombra-card: 0 16px 48px rgba(0, 0, 0, 0.75);
+            --transicao-suave: 0.3s ease-in-out;
+        }
+
+        /* Estilos do Corpo e Layout */
+        body {
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto-principal);
+            font-family: 'Merriweather', Georgia, serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 30px 20px;
+            overflow-x: hidden;
+            gap: 30px;
+        }
+
+        .app {
+            display: flex;
+            gap: 30px;
+            max-width: 1300px;
+            width: 100%;
+        }
+
+        /* Barra Lateral (Sidebar) */
+        .sidebar {
+            width: 320px;
+            background: var(--cor-painel);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--sombra-card);
+            border: 1px solid var(--cor-borda-escura);
+            position: sticky;
+            top: 30px;
+            height: calc(100vh - 60px);
+            overflow: auto;
+            flex-shrink: 0;
+        }
+
+        .sidebar h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--cor-accent);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-transform: capitalize;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--cor-borda-clara);
+            padding-bottom: 10px;
+        }
+
+        .chap-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .chap-item {
+            display: block;
+            background: transparent;
+            border-radius: 12px;
+            padding: 12px 18px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: var(--cor-texto-principal);
+            transition: background var(--transicao-suave), transform var(--transicao-suave);
+            text-decoration: none;
+            font-size: 1.1em;
+        }
+
+        .chap-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: scale(1.02);
+        }
+
+        .chap-item.active {
+            background: rgba(229, 184, 74, 0.15);
+            border-color: rgba(229, 184, 74, 0.4);
+            color: var(--cor-accent);
+            font-weight: 700;
+        }
+
+        .meta {
+            margin-top: 24px;
+            color: var(--cor-texto-mutado);
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        /* Área do Livro (Stage) */
+        .stage {
+            flex-grow: 1;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .book {
+            width: 100%;
+            height: 680px;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 2000px;
+            padding: 10px;
+        }
+
+        .page {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, #111115, #0a0a0d);
+            border-radius: 18px;
+            box-shadow: var(--sombra-card);
+            padding: 40px 50px;
+            overflow-y: auto;
+            transform-origin: left center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 1;
+            transition: transform 1s cubic-bezier(0.68, -0.55, 0.27, 1.55), opacity 0.5s ease-in-out;
+            border: 1px solid var(--cor-borda-escura);
+        }
+
+        .page h1 {
+            font-family: 'Playfair Display', serif;
+            text-align: center;
+            color: var(--cor-accent);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .page p {
+            font-size: 1.1em;
+            line-height: 1.9;
+            text-align: justify;
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Efeito de virar a página */
+        .page.animating {
+            transform: rotateY(-180deg);
+            opacity: 0.8;
+            z-index: 2;
+        }
+        .page.next-page {
+            transform: rotateY(0deg);
+            z-index: 1;
+        }
+
+        /* Controles de Navegação */
+        .controls {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 900px;
+        }
+
+        .btn {
+            background: var(--cor-painel);
+            color: var(--cor-accent);
+            border: 1px solid var(--cor-borda-clara);
+            padding: 14px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: background var(--transicao-suave), transform var(--transicao-suave);
+        }
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress {
+            color: var(--cor-texto-mutado);
+            font-size: 1em;
+        }
+
+        /* Rodapé */
+        footer {
+            color: var(--cor-texto-mutado);
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        
+
+        @media (max-width: 1200px) {
+            .sidebar {
+                width: 280px;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .app {
+                flex-direction: column;
+                align-items: center;
+            }
+            .sidebar {
+                position: static;
+                height: auto;
+                width: 100%;
+                max-width: 900px;
+            }
+            .book {
+                height: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <h2>Índice</h2>
+            <div class="chap-list" id="chapList"></div>
+            <div class="meta">Use as setas do teclado ou clique para navegar.</div>
+        </aside>
+
+        <main class="stage">
+            <div class="book" id="book">
+                <div class="page" id="pageA"></div>
+                <div class="page" id="pageB"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn" id="prevBtn">⬅️ Anterior</button>
+                <div class="progress" id="progress">— / —</div>
+                <button class="btn" id="nextBtn">Próxima ➡️</button>
+            </div>
+            
+            <footer>&copy; 2025 — O Despertar de Nico</footer>
+        </main>
+    </div>
+
+    <script>
+        const chapters = [
+            { title: "Capítulo 1", content: `
+                <h1>Capítulo 1</h1>
+                <p>Há oito anos, a infância de Nico começou a desmoronar, mergulhando em uma escuridão que ele jamais poderia ter imaginado. Dia após dia, ele era vítima de abusos cruéis nas mãos daqueles que deveriam protegê-lo: seus próprios pais e seu irmão mais velho. A tortura física e verbal era insuportável, mas, aos olhos de Nico, aquilo parecia normal. Ele acreditava que todas as famílias eram assim. Então, ele calou-se, engolindo o sofrimento em silêncio, enquanto sua mente e personalidade eram lentamente corroídas pelas agressões constantes. Algo dentro dele estava mudando, algo assustador.
+
+Nico vivia em um isolamento doloroso. Para ele, a amizade era desnecessária, uma ilusão. Aos onze anos, no dia 5 de agosto de 1987, sua vida parecia ter encontrado um frágil equilíbrio, apesar da tormenta que era sua família. Mas, em um dia aparentemente comum, algo aconteceu. Nico fez uma descoberta que abalou seu mundo de uma forma inimaginável: ele percebeu que nenhum ser humano havia sofrido tanto quanto ele em tão pouco tempo de vida. Essa revelação foi como um terremoto, sacudindo os alicerces de sua mente já fragilizada. A linha entre o certo e o errado começou a se desvanecer, e Nico foi arrastado para um turbilhão de pensamentos confusos e sombrios.
+
+Os dias se arrastavam, e uma pergunta martelava incessantemente em sua mente: *Por que eu?* Por que ele era o único a enfrentar tamanha provação? Durante quatro longos anos e meio, essa questão se tornou o centro de sua existência, consumindo-o até a alma. Nico embarcou em uma jornada interna, explorando os recantos mais profundos de sua psique fragmentada. Ele estava determinado a desvendar os segredos que envolviam sua história, a encontrar uma razão para toda a dor que havia enfrentado. Era uma busca por verdade, por redenção, por algo que pudesse justificar o injustificável.
+
+Mas, à medida que Nico mergulhava mais fundo em sua própria mente, ele começou a perceber que as respostas que buscava talvez não fossem o que ele esperava. E, em meio ao caos, uma nova pergunta surgiu: até onde ele estava disposto a ir para encontrar a paz? A jornada de Nico não era apenas sobre sobreviver ao passado, mas sobre enfrentar o futuro que ele mesmo estava construindo, peça por peça, em meio às sombras.</p>
+
+
+                `},
+            { title: "Capítulo 2: O Despertar de Nico", content: `
+                <h1>Capítulo 2: O Despertar de Nico</h1>
+                <p>O décimo sexto aniversário de Nico estava a apenas um dia de distância, e ele mal podia imaginar que sua vida tranquila estava prestes a ser transformada para sempre. Sem planos especiais para celebrar, ele decidiu dar uma caminhada pelo centro da cidade, apenas para passar o tempo. Mas o destino tinha outros planos para ele.
+
+Enquanto caminhava pelas ruas movimentadas, Nico deparou-se com um veículo imponente e luxuoso que parou abruptamente à sua frente. Antes que pudesse reagir, um homem idoso saiu do carro e, com movimentos rápidos e precisos, aplicou um tranquilizante em Nico. Desesperado, ele tentou lutar, mas a escuridão o envolveu, e ele perdeu a consciência.
+
+Quando Nico finalmente acordou, encontrou-se em um lugar completamente desconhecido, cercado por rostos estranhos e uma atmosfera carregada de mistério. Um homem se aproximou e, após trocar algumas palavras com o idoso que o havia sequestrado, ambos se voltaram para Nico. Eles se apresentaram como figuras poderosas, mestres do submundo, e revelaram que haviam escolhido Nico para um destino extraordinário.
+
+Segundo eles, Nico possuía qualidades excepcionais que o tornavam o candidato perfeito para se tornar o próximo imperador do submundo. Eles explicaram que, após um treinamento rigoroso e desafiador, ele desenvolveria o poder necessário para comandar e subjugar todos aqueles que cruzassem seu caminho. A ideia era avassaladora, mas também intrigante.
+
+Nico sentiu-se dividido entre a empolgação de um futuro cheio de poder e a apreensão de um mundo completamente novo e perigoso. Ele estava prestes a embarcar em uma jornada de autodescoberta e aprimoramento, enfrentando desafios que testariam seus limites físicos e mentais. A confiança depositada nele por aquelas figuras misteriosas trouxe uma mistura de medo e curiosidade, pois ele percebeu que sua vida nunca mais seria a mesma.
+
+Agora, Nico enfrentava uma escolha crucial: aceitar o papel que lhe fora designado e abraçar o poder que prometia transformá-lo em um imperador do submundo, ou rejeitar essa nova realidade e buscar um caminho diferente. Qualquer que fosse sua decisão, uma coisa era certa — sua jornada estava apenas começando, e o destino o aguardava com braços abertos.
+
+Prepare-se para mergulhar em uma história repleta de suspense, ação e descobertas, onde cada passo de Nico o levará mais perto de seu verdadeiro destino. O submundo o aguarda, e você não vai querer perder essa aventura emocionante!
+
+</p>
+                `},
+            { title: "Capítulo 3", content: `
+                <h1>Capítulo 3</h1>
+                <p>Uma semana havia se passado desde que Nico organizou seus pensamentos e a hora de partir para seu treinamento finalmente chegara. Ao chegar no local planejado, Nico se deparou com o senhor que o aguardava. O senhor envolveu Nico em uma esfera de chamas azuis, informando-lhe que ele só retornaria ao submundo quando completasse todos os treinamentos, embarcando em uma jornada por diversos mundos em busca do poder necessário para governar.
+O primeiro treinamento proposto para Nico era uma simulação que o teleportou para um mundo dentro de sua própria mente. Nesse lugar, seu objetivo era recrutar os melhores entre os melhores e eliminar o restante da população. E assim, a jornada de Nico rumo à busca por subordinados iniciou-se. Sua primeira parada foi na cidade próxima de Anteric, conhecida por ser um dos lugares mais renomados do mundo. Dirigindo-se ao centro da cidade, Nico teve sua atenção capturada por um garoto singular.
+O jovem, com aproximadamente 17 anos, possuía cabelos brancos e pele clara, irradiando um poder inexplicável. Mesmo diante de sua juventude, Nico conseguia sentir a aura de força que emanava do garoto. Percebendo que o jovem estava enfrentando uma situação desesperadora, Nico enxergou nisso uma oportunidade de estabelecer uma relação com um potencial subordinado. No entanto, descobriu que o garoto estava prestes a ser julgado por nobres que o acusavam de cometer assassinato em massa.
+Diante desses fatos, Nico se viu diante de uma escolha difícil. A única opção que encontrou foi tomar uma atitude drástica. Decidiu que deveria eliminar todos os presentes, com exceção do garoto, para evitar sua condenação injusta. Com uma determinação sombria, Nico se preparou para enfrentar a tarefa que se impunha diante de si: o início de um massacre que iria desafiar todas as noções de moralidade. As palavras saíram de seus lábios sombrios:
+— Que comece o massacre.</p>
+                `}
+        ];
+
+        const chapListEl = document.getElementById('chapList');
+        const pageA = document.getElementById('pageA');
+        const pageB = document.getElementById('pageB');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progress = document.getElementById('progress');
+        
+        let currentChapterIndex = 0;
+        let isAnimating = false;
+
+        function renderChapter(pageElement, chapterIndex) {
+            pageElement.innerHTML = chapters[chapterIndex].content;
+            pageElement.scrollTop = 0;
+        }
+
+        function updateUI() {
+            progress.textContent = `${currentChapterIndex + 1} / ${chapters.length}`;
+            prevBtn.disabled = currentChapterIndex === 0 || isAnimating;
+            nextBtn.disabled = currentChapterIndex === chapters.length - 1 || isAnimating;
+            
+            document.querySelectorAll('.chap-item').forEach((btn, index) => {
+                btn.classList.toggle('active', index === currentChapterIndex);
+            });
+        }
+
+        function flipPage(direction) {
+            if (isAnimating) return;
+            
+            const nextIndex = currentChapterIndex + direction;
+            if (nextIndex < 0 || nextIndex >= chapters.length) return;
+
+            isAnimating = true;
+            const currentPage = pageA.style.zIndex > pageB.style.zIndex ? pageA : pageB;
+            const nextPage = currentPage === pageA ? pageB : pageA;
+
+            nextPage.classList.remove('animating', 'next-page');
+            currentPage.classList.add('animating');
+            
+            renderChapter(nextPage, nextIndex);
+            
+            currentPage.addEventListener('transitionend', () => {
+                isAnimating = false;
+                currentPage.classList.remove('animating');
+                currentPage.style.zIndex = 1;
+                nextPage.style.zIndex = 2;
+                currentChapterIndex = nextIndex;
+                updateUI();
+            }, { once: true });
+
+            updateUI();
+        }
+
+        function jumpToChapter(index) {
+            if (index === currentChapterIndex || isAnimating) return;
+            const direction = index > currentChapterIndex ? 1 : -1;
+            flipPage(direction);
+        }
+
+        function init() {
+            chapters.forEach((chapter, index) => {
+                const btn = document.createElement('a');
+                btn.className = 'chap-item';
+                btn.textContent = `${index + 1}. ${chapter.title}`;
+                btn.href = `#chap-${index + 1}`;
+                btn.onclick = (e) => {
+                    e.preventDefault();
+                    jumpToChapter(index);
+                };
+                chapListEl.appendChild(btn);
+            });
+
+            renderChapter(pageA, 0);
+            pageA.style.zIndex = 2;
+            pageB.style.zIndex = 1;
+            updateUI();
+        }
+
+        prevBtn.onclick = () => flipPage(-1);
+        nextBtn.onclick = () => flipPage(1);
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === "ArrowRight") flipPage(1);
+            if (e.key === "ArrowLeft") flipPage(-1);
+        });
+
+        init();
+    </script>
+</body>
+</html>
