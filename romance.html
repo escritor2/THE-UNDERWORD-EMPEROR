@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romance - Isabella e Lucas</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Crimson+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8B4513;
+            --secondary: #D2B48C;
+            --accent: #A52A2A;
+            --light: #F5F5DC;
+            --dark: #2F1B0C;
+            --transition: all 0.4s ease;
+            --shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            --gold: #D4AF37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(135deg, #f5f5dc 0%, #e6d2aa 100%);
+            color: var(--dark);
+            line-height: 1.8;
+            overflow-x: hidden;
+            background-attachment: fixed;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .book-container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(139, 69, 19, 0.1);
+            overflow: hidden;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .book-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--gold), var(--primary));
+            z-index: 10;
+        }
+
+        header {
+            background: linear-gradient(rgba(210, 180, 140, 0.97), rgba(210, 180, 140, 0.92)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill-opacity="0.05" fill="%238B4513" width="100" height="100"/></svg>');
+            padding: 50px 30px;
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            position: relative;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background: var(--light);
+            border: 3px solid var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px var(--light);
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1.4rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .author {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            color: var(--accent);
+            position: relative;
+            display: inline-block;
+            padding: 0 15px;
+        }
+
+        .author::before, .author::after {
+            content: '~';
+            position: relative;
+            margin: 0 10px;
+            color: var(--primary);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px;
+            background: rgba(210, 180, 140, 0.2);
+            border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .theme-controls, .navigation-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        button {
+            background: linear-gradient(to bottom, var(--primary), var(--dark));
+            color: var(--light);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(to bottom, var(--accent), var(--primary));
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .chapter-select {
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: 2px solid var(--primary);
+            background: var(--light);
+            color: var(--dark);
+            font-family: 'Crimson Text', serif;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .chapter-select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.3);
+        }
+
+        .chapter {
+            padding: 50px;
+            position: relative;
+        }
+
+        .chapter::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 30px;
+            right: 30px;
+            height: 1px;
+            background: linear-gradient(to right, transparent, var(--primary), transparent);
+        }
+
+        .chapter-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            color: var(--primary);
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .chapter-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(to right, var(--gold), var(--accent), var(--gold));
+            border-radius: 3px;
+        }
+
+        .chapter-content {
+            font-size: 1.25rem;
+            text-align: justify;
+        }
+
+        .chapter-content p {
+            margin-bottom: 30px;
+            text-indent: 40px;
+            position: relative;
+        }
+
+        .chapter-content p::first-letter {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: var(--primary);
+            float: left;
+            line-height: 1;
+            margin-right: 8px;
+            margin-top: 8px;
+            font-weight: 700;
+        }
+
+        .dialogue {
+            margin: 25px 0;
+            padding-left: 40px;
+            position: relative;
+            font-style: italic;
+        }
+
+        .dialogue::before {
+            content: '"';
+            position: absolute;
+            left: 0;
+            top: -10px;
+            font-size: 4rem;
+            color: var(--secondary);
+            font-family: 'Playfair Display', serif;
+            opacity: 0.3;
+        }
+
+        .page-turn {
+            position: absolute;
+            top: 50%;
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 5;
+            box-shadow: var(--shadow);
+        }
+
+        .page-turn:hover {
+            transform: scale(1.1);
+            background: var(--accent);
+        }
+
+        .page-turn.prev {
+            left: -25px;
+        }
+
+        .page-turn.next {
+            right: -25px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(rgba(210, 180, 140, 0.3), rgba(210, 180, 140, 0.5));
+            border-top: 1px solid rgba(139, 69, 19, 0.2);
+            color: var(--dark);
+            font-size: 1rem;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--secondary);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 100;
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .bookmark {
+            position: absolute;
+            right: 30px;
+            top: -10px;
+            width: 40px;
+            height: 70px;
+            background: var(--accent);
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+            z-index: 2;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .book-container {
+                margin: 20px auto;
+                border-radius: 10px;
+            }
+            
+            header {
+                padding: 30px 15px;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .chapter {
+                padding: 30px 20px;
+            }
+            
+            .chapter-title {
+                font-size: 1.8rem;
+            }
+            
+            .chapter-content {
+                font-size: 1.1rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .page-turn {
+                display: none;
+            }
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .chapter {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        /* Modo escuro */
+        .dark-mode {
+            background: linear-gradient(135deg, #1a1208 0%, #2c1d0f 100%);
+            color: #e0d0b8;
+        }
+
+        .dark-mode .book-container {
+            background: #2a1f14;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(139, 69, 19, 0.3);
+        }
+
+        .dark-mode header {
+            background: linear-gradient(rgba(79, 46, 8, 0.9), rgba(94, 56, 13, 0.85)), url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill-opacity="0.05" fill="%23D2B48C" width="100" height="100"/></svg>');
+        }
+
+        .dark-mode .controls {
+            background: rgba(79, 46, 8, 0.3);
+        }
+
+        .dark-mode .chapter-select {
+            background: #3e2c1a;
+            color: #e0d0b8;
+            border-color: #6b4c2a;
+        }
+
+        .dark-mode footer {
+            background: linear-gradient(rgba(79, 46, 8, 0.3), rgba(94, 56, 13, 0.4));
+            color: #d2b48c;
+        }
+
+        /* Efeito de página antiga */
+        .page-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            background-image: 
+                linear-gradient(rgba(210, 180, 140, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(210, 180, 140, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            mix-blend-mode: multiply;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress-bar"></div>
+    
+    <div class="book-container">
+        <div class="page-effect"></div>
+        <div class="bookmark"></div>
+        
+        <header>
+            <h1>Romance</h1>
+            <p class="subtitle">A história de Isabella e Lucas</p>
+            <p class="author">Uma jornada do ódio ao amor</p>
+        </header>
+
+        <div class="controls">
+            <div class="theme-controls">
+                <button id="theme-toggle">
+                    <i class="fas fa-moon"></i> Modo Escuro
+                </button>
+                <button id="font-increase">
+                    <i class="fas fa-text-height"></i> A+
+                </button>
+                <button id="font-decrease">
+                    <i class="fas fa-text-height"></i> A-
+                </button>
+            </div>
+            
+            <div class="navigation-controls">
+                <select id="chapter-select" class="chapter-select">
+                    <option value="1">Capítulo 1: O Ódio</option>
+                    <option value="2">Capítulo 2: O Desafio</option>
+                    <option value="3">Capítulo 3: A Revelação</option>
+                    <option value="4">Capítulo 4: A Mudança</option>
+                    <option value="5">Capítulo 5: A Confrontação</option>
+                    <option value="6">Capítulo 6: O Precipício</option>
+                    <option value="7">Capítulo 7: O Novo Começo</option>
+                    <option value="8">Capítulo 8: O Escritório</option>
+                    <option value="9">Capítulo 9: A Espera</option>
+                    <option value="10">Capítulo 10: A Conversa</option>
+                    <option value="11">Capítulo 11: O Despertar</option>
+                    <option value="12">Capítulo 12: A Amiga</option>
+                    <option value="13">Capítulo 13: O Passado</option>
+                    <option value="14">Capítulo 14: A Conexão</option>
+                    <option value="15">Capítulo 15: A Diretoria</option>
+                    <option value="16">Capítulo 16: A Proposta</option>
+                    <option value="17">Capítulo 17: A Decisão</option>
+                    <option value="18">Capítulo 18: As Consequências</option>
+                    <option value="19">Capítulo 19: A Resposta</option>
+                    <option value="20">Capítulo 20: A Aprovação</option>
+                    <option value="21">Capítulo 21: A Parceria</option>
+                    <option value="22">Capítulo 22: A Entrevista</option>
+                    <option value="23">Capítulo 23: O Ataque</option>
+                    <option value="24">Capítulo 24: O Medo</option>
+                    <option value="25">Capítulo 25: O Futuro</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="chapter">
+            <h2 class="chapter-title">Capítulo 1: O Ódio</h2>
+            <div class="chapter-content">
+                <p>Isabella odiava cada detalhe dele. A porta do café batendo contra a parede todas as manhãs, o som seco que fazia todos olharem, como se o mundo fosse obrigado a abrir caminho. O sorriso torto, calculado só para irritá-la. Lucas Monteiro era um tropeço diário, uma pedra no sapato que ela não conseguia evitar.</p>
+                
+                <div class="dialogue">
+                    — Mais uma vez você roubou minha mesa — disse, os dedos firmes no copo de café como se fosse sua única âncora.
+                </div>
+                
+                <p>Lucas ergueu os olhos do laptop, aquele olhar preguiçoso e desafiador que a fazia querer arremessar algo nele.</p>
+                
+                <div class="dialogue">
+                    — Não tem seu nome escrito, Isabella. O mundo não gira ao seu redor.
+                </div>
+                
+                <p>Ela puxou o ar fundo, contando até dez. Mas o jeito como ele sorria, satisfeito com a própria ousadia, só aumentava sua raiva.</p>
+                
+                <div class="dialogue">
+                    — Você é insuportável.
+                </div>
+                
+                <div class="dialogue">
+                    — E você é previsível — retrucou, fechando o notebook com um estalo seco. — Todo dia a mesma cena. Já pensou que talvez a gente só precise de um pouco de distância?
+                </div>
+                
+                <div class="dialogue">
+                    — Ótimo. Some.
+                </div>
+                
+                <p>Virou as costas, mas não sem antes notar o brilho nos olhos dele. Um brilho irritante, como se Lucas escondesse uma piada privada, um segredo ao qual só ele tinha acesso.</p>
+                
+                <p>E havia mesmo algo. Um detalhe pequeno, quase invisível, que ele havia percebido sem querer em uma dessas manhãs tensas. Desde então, guardava aquilo em silêncio, como quem protege um feitiço. Talvez fosse nada. Talvez fosse tudo. Mas era o bastante para fazê-lo olhar mais tempo do que deveria.</p>
+                
+                <p>O ódio, porém, era mais simples. O ódio era seguro.</p>
+                <p>E, por enquanto, era o único lugar onde os dois sabiam se encontrar.</p>
+            </div>
+        </div>
+
+        <div class="page-turn prev">
+            <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="page-turn next">
+            <i class="fas fa-chevron-right"></i>
+        </div>
+
+        <footer>
+            <p>© 2023 - Romance - Isabella e Lucas - Todos os direitos reservados</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do DOM
+            const themeToggle = document.getElementById('theme-toggle');
+            const fontIncrease = document.getElementById('font-increase');
+            const fontDecrease = document.getElementById('font-decrease');
+            const chapterSelect = document.getElementById('chapter-select');
+            const progressBar = document.getElementById('progress-bar');
+            const body = document.body;
+            const chapterContent = document.querySelector('.chapter-content');
+            const nextBtn = document.querySelector('.page-turn.next');
+            const prevBtn = document.querySelector('.page-turn.prev');
+            
+            // Modo escuro
+            themeToggle.addEventListener('click', function() {
+                body.classList.toggle('dark-mode');
+                if (body.classList.contains('dark-mode')) {
+                    themeToggle.innerHTML = '<i class="fas fa-sun"></i> Modo Claro';
+                } else {
+                    themeToggle.innerHTML = '<i class="fas fa-moon"></i> Modo Escuro';
+                }
+            });
+            
+            // Controle de tamanho de fonte
+            let fontSize = 1;
+            fontIncrease.addEventListener('click', function() {
+                if (fontSize < 1.5) {
+                    fontSize += 0.1;
+                    chapterContent.style.fontSize = `${fontSize}rem`;
+                }
+            });
+            
+            fontDecrease.addEventListener('click', function() {
+                if (fontSize > 0.8) {
+                    fontSize -= 0.1;
+                    chapterContent.style.fontSize = `${fontSize}rem`;
+                }
+            });
+            
+            // Navegação por capítulos
+            chapterSelect.addEventListener('change', function() {
+                // Aqui iria a lógica para carregar o capítulo selecionado
+                alert(`Carregando capítulo ${this.value}`);
+            });
+            
+            // Navegação por botões
+            nextBtn.addEventListener('click', function() {
+                const currentChapter = parseInt(chapterSelect.value);
+                if (currentChapter < 25) {
+                    chapterSelect.value = currentChapter + 1;
+                    chapterSelect.dispatchEvent(new Event('change'));
+                }
+            });
+            
+            prevBtn.addEventListener('click', function() {
+                const currentChapter = parseInt(chapterSelect.value);
+                if (currentChapter > 1) {
+                    chapterSelect.value = currentChapter - 1;
+                    chapterSelect.dispatchEvent(new Event('change'));
+                }
+            });
+            
+            // Barra de progresso
+            window.addEventListener('scroll', function() {
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                const scrollPercent = (scrollTop / (documentHeight - windowHeight)) * 100;
+                progressBar.style.transform = `scaleX(${scrollPercent / 100})`;
+            });
+            
+            // Efeito de máquina de escrever para o primeiro parágrafo
+            const firstParagraph = document.querySelector('.chapter-content p:first-child');
+            const originalText = firstParagraph.textContent;
+            firstParagraph.textContent = '';
+            let charIndex = 0;
+            
+            function typeWriter() {
+                if (charIndex < originalText.length) {
+                    firstParagraph.textContent += originalText.charAt(charIndex);
+                    charIndex++;
+                    setTimeout(typeWriter, 30);
+                }
+            }
+            
+            // Inicia o efeito após um breve delay
+            setTimeout(typeWriter, 1000);
+        });
+    </script>
+</body>
+</html>
